@@ -6,9 +6,9 @@
 </head>
 <body>
     <script>
-        // URL الموقع الخارجي الذي تريد تحويل الزائر إليه عبر بروكسي CORS الخاص بك
+        // URL الموقع الخارجي الذي تريد تحويل الزائر إليه عبر بروكسي CORS
         var targetUrl = 'http://testphp.vulnweb.com/';
-        var proxyUrl = 'https://magenta-artistic-peace.glitch.me/' + targetUrl;
+        var proxyUrl = 'https://cors-anywhere.herokuapp.com/' + targetUrl;
 
         // الكود الذي سيتم حقنه في الصفحة الهدف
         var payload = '<script>alert("This site is vulnerable to self-XSS!");<\/script>';
@@ -21,7 +21,7 @@
                     // حقن الكود في محتوى الصفحة الهدف
                     var modifiedContent = data.replace('</body>', payload + '</body>');
 
-                    // إنشاء نافذة جديدة لعرض المحتوى المعدل
+                    // إنشاء عنصر جديد لعرض المحتوى المعدل
                     var newWindow = window.open('', '_blank');
                     newWindow.document.open();
                     newWindow.document.write(modifiedContent);
